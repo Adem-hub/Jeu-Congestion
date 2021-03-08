@@ -6,11 +6,12 @@ class Noeud:
         self.nom=nom
 
 class Arete:
-    def __init__(self,voyage):
+    def __init__(self,voyage,variabilite,tps):
         self.voyage=voyage
-        self.time=randint(0,10)
+        self.time=tps
+        self.variable=variabilite
     def add_time(self,temps):
-        self.time+=0.1
+        self.time+=0.01
 
 
 class Graphe:
@@ -31,8 +32,14 @@ class Graphe:
             self.Villes_classes.append(Node)
 
     def Genere_Aretes(self):
-        for i in self.Jonctions:
-            Jct=Arete(i)
+        for i in range(len(self.Jonctions)):
+            if self.Jonctions[i]==['Lyon','Lille']:
+                Jct=Arete(['Lyon','Lille'],False,0)
+            else:
+                if i%2==0:
+                    Jct=Arete(self.Jonctions[i],False,45)
+                else:
+                    Jct=Arete(self.Jonctions[i],True,15)
             self.Aretes_classes.append(Jct)
 
 
@@ -42,25 +49,75 @@ class Voiture:
         self.Temps_passe=[]
 
 
-G=Graphe(('Marseille','Lyon','Paris','Lille'),(['Paris','Lyon'],['Paris','Lille'],['Lille','Marseille'],['Lyon','Marseille']))
+G=Graphe(('Marseille','Lyon','Paris','Lille'),(['Paris','Lyon'],['Paris','Lille'],['Lille','Marseille'],['Lyon','Marseille'],['Lyon','Lille']))
 
 Noeuds= G.Villes_classes
 Route =G.Aretes_classes
 
-def Generer_Chemins_possibles(A,B):
-    Liste=[]
-    A=[i for i in Noeuds if i.nom==A][0]
-    B=[i for i in Noeuds if i.nom==B][0]
-    X=True
-    while X:
-        L=[A]
-        noeud=A
-        while noeud!=B:
-            for i in range(Liste):
-                if noeud==B:
-                    pass
+def Chemin(A,B):
+    #Algorithme de Djikstra (en carton mais ca marche quand même)
+    L=[[0,[A,A]]]
+    Liste_chemin_court=[B]
+    visited=[]
+    alli={i.nom:0 for i in Noeuds}
+    Dico={A:[A,0]}
+    provenance= L[0][1][0]
+    w=0
+    L.pop(0)
+    while alli.keys()!=Dico.keys():
+        class_noeud=[i for i in Noeuds if i.nom==provenance][0]
+        for arrivee in class_noeud.voisins:
+            if arrivee not in Dico.keys():
+                v=[i for i in Route if [provenance,arrivee]==i.voyage or [arrivee,provenance]==i.voyage][0]
+                L.append([v.time+w,[provenance,arrivee]])
+        mini=0
+        for i in range(len(L)):
+            if L[i][0]<L[mini][0]:
+                mini=i
+        X=L.pop(mini)
+        if X[1][1] not in Dico.keys():
+            Dico[X[1][1]]=[X[1][0],X[0]]
+            w+=X[0]
+            provenance=X[1][1]
+            print(Dico)
+    Nd=B
+    while Nd!=A:
+        Nd=Dico[Nd][0]
+        Liste_chemin_court.append(Nd)
+    return Liste_chemin_court[::-1]
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Generation
+
+#
+# i=0
+# while i<4000:
+#     m=0
+#     X=Chemin('Paris')
+#     m+=X[0].time
+#     x=Chemin([x for x in X[0].voyage if x!='Paris'][0])
+#     m+=x.time()
 
 
 
